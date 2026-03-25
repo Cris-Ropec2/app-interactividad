@@ -1,0 +1,34 @@
+body {
+    /* Agregamos un color de respaldo por si la imagen falla */
+    background-color: #1a1a1a; 
+    background-image: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%), 
+                    url('../img/fondo_j.jpg');
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    max-width: 90%;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+    cursor: crosshair;
+    background: rgba(0, 0, 0, 0.3) !important; /* Reemplaza el color sólido por uno traslúcido */
+}
+
+footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
