@@ -1,50 +1,48 @@
-}<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulación de Rebote | C. Rodríguez</title>
-    <link rel="shortcut icon" href="./assets/img/favincon.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/styles.css">
+    <link rel="icon" type="image/png" href="./assets/img/favicon.png">
 </head>
-<body>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+<body class="d-flex flex-column"> <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
         <div class="container">
             <a class="navbar-brand" href="#">ITP Simulation</a>
             <span class="navbar-text text-white"> Christopher Rodríguez Pérez </span>
         </div>
     </nav>
 
-    <main class="container my-5 d-flex flex-column align-items-center">
+    <main class="flex-grow-1 d-flex align-items-center justify-content-center p-2">
         <div class="glass-card p-4 shadow-lg text-center">
-            <h2 class="mb-4 text-white">Panel de Simulación</h2>
+            <h2 class="mb-3 text-white">Panel de Simulación</h2>
             
-            <div class="row g-3 mb-3 justify-content-center">
-                <div class="col-auto">
-                    <input type="number" id="w-rebote" class="form-control" placeholder="Ancho" value="800">
+            <div class="row g-2 mb-3 justify-content-center">
+                <div class="col-3">
+                    <input type="number" id="w-rebote" class="form-control form-control-sm" placeholder="Ancho" value="800">
+                </div>
+                <div class="col-3">
+                    <input type="number" id="h-rebote" class="form-control form-control-sm" placeholder="Alto" value="400">
+                </div>
+                <div class="col-3">
+                    <input type="number" id="n-rebote" class="form-control form-control-sm" placeholder="N°" value="12">
                 </div>
                 <div class="col-auto">
-                    <input type="number" id="h-rebote" class="form-control" placeholder="Alto" value="400">
-                </div>
-                <div class="col-auto">
-                    <input type="number" id="n-rebote" class="form-control" placeholder="N° Círculos" value="12">
-                </div>
-                <div class="col-auto">
-                    <button id="btn-rebote" class="btn btn-primary">Reiniciar</button>
+                    <button id="btn-rebote" class="btn btn-sm btn-primary">Reiniciar</button>
                 </div>
             </div>
 
             <canvas id="canvas-rebote" class="rounded border border-light"></canvas>
-            <p class="mt-2 text-white-50 small">Pasa el mouse sobre los círculos para interactuar.</p>
+            <p class="mt-2 text-white-50 small mb-0">Pasa el mouse sobre los círculos para interactuar.</p>
         </div>
     </main>
 
-    <footer class="footer bg-dark text-white text-center py-3 mt-auto">
+    <footer class="bg-dark text-white text-center py-2">
         <div class="container">
-            <p class="mb-0">© 2026 - Desarrollado por <strong>Christopher Rodríguez Pérez</strong></p>
-            <small>Instituto Tecnológico de Pachuca - Ingeniería en Sistemas</small>
+            <p class="mb-0 small">© 2026 - Desarrollado por <strong>Christopher Rodríguez Pérez</strong></p>
+            <small style="font-size: 0.7rem;">Instituto Tecnológico de Pachuca - Ingeniería en Sistemas</small>
         </div>
     </footer>
 
