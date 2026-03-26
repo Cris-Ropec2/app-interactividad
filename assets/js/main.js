@@ -1,5 +1,5 @@
 /**
- * main.js - Juego de Burbujas Progresivo (Velocidad + Cantidad)
+ * main.js - Juego de Burbujas: Curva de Velocidad Suavizada
  * Programador: Christopher Rodríguez Pérez
  * Instituto Tecnológico de Pachuca
  */
@@ -18,11 +18,10 @@
     let particles = [];
     let window_width, window_height;
 
-    // Estado del Juego
     let eliminatedInLevel = 0;
-    let totalToEliminate = 10; // Cambia según el nivel
+    let totalToEliminate = 10; 
     let isLevelActive = false;
-    let currentSpeed = 1;
+    let currentSpeed = 0.5; // Base mucho más baja
 
     const mouse = { x: null, y: null };
 
@@ -32,10 +31,8 @@
         mouse.y = e.clientY - rect.top;
     });
 
-    // Evento Pointerdown para respuesta inmediata
     canvas.addEventListener('pointerdown', (e) => {
         if (!isLevelActive) return;
-        
         const rect = canvas.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const clickY = e.clientY - rect.top;
@@ -44,7 +41,7 @@
             const c = circles[i];
             if (!c.isExploding && !c.isDone) {
                 const dist = Math.sqrt(Math.pow(clickX - c.posX, 2) + Math.pow(clickY - c.posY, 2));
-                if (dist < c.radius + 5) {
+                if (dist < c.radius + 8) { // Margen un poco más generoso
                     c.explode();
                     break; 
                 }
@@ -56,8 +53,8 @@
         constructor(x, y, color) {
             this.x = x; this.y = y; this.color = color;
             this.radius = Math.random() * 2 + 1;
-            this.dx = (Math.random() - 0.5) * 10;
-            this.dy = (Math.random() - 0.5) * 10;
+            this.dx = (Math.random() - 0.5) * 8;
+            this.dy = (Math.random() - 0.5) * 8;
             this.alpha = 1;
             this.decay = 0.04;
         }
@@ -88,15 +85,16 @@
             this.isExploding = false;
             this.alpha = 1;
             this.posX = Math.random() * (window_width - this.radius * 2) + this.radius;
-            // Distribución inicial aleatoria, después siempre desde abajo
-            this.posY = isInitial ? Math.random() * window_height : window_height + this.radius + (Math.random() * 200);
-            this.dx = (Math.random() - 0.5) * 2.5;
-            this.dy = -(Math.random() * this.speed + 1.5);
+            // Mayor dispersión vertical para que no salgan todos juntos
+            this.posY = isInitial ? Math.random() * window_height : window_height + this.radius + (Math.random() * 400);
+            this.dx = (Math.random() - 0.5) * 1.5;
+            // FORMULA DE VELOCIDAD: Se redujo la base y el multiplicador
+            this.dy = -(Math.random() * this.speed + 0.4); 
         }
 
         explode() {
             this.isExploding = true;
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 12; i++) {
                 particles.push(new Particle(this.posX, this.posY, this.color));
             }
         }
@@ -105,18 +103,13 @@
             if (this.isDone) return;
 
             if (!this.isExploding) {
-                // Hover effect
-                let isHover = false;
-                if (mouse.x !== null) {
-                    const d = Math.sqrt(Math.pow(mouse.x - this.posX, 2) + Math.pow(mouse.y - this.posY, 2));
-                    if (d < this.radius) isHover = true;
-                }
+                let isHover = (mouse.x && Math.sqrt(Math.pow(mouse.x - this.posX, 2) + Math.pow(mouse.y - this.posY, 2)) < this.radius);
                 this.displayColor = isHover ? "#FFFFFF" : this.color;
 
                 this.posX += this.dx;
                 this.posY += this.dy;
 
-                if (this.posY + this.radius < 0) this.resetPos(false);
+                if (this.posY + this.radius < -50) this.resetPos(false);
                 if (this.posX + this.radius > window_width || this.posX - this.radius < 0) this.dx = -this.dx;
             } else {
                 this.alpha -= 0.15;
@@ -145,13 +138,12 @@
 
     function updateStats() {
         displayNum.innerText = eliminatedInLevel;
-        // El porcentaje ahora se basa en el total de círculos del nivel
         let progress = Math.floor((eliminatedInLevel / totalToEliminate) * 100);
         displayPercent.innerText = progress + "%";
         
         if (eliminatedInLevel >= totalToEliminate) {
             isLevelActive = false;
-            gameMsg.innerText = "¡Nivel Superado! Sube al siguiente.";
+            gameMsg.innerText = "¡Nivel Superado! Elige el siguiente reto.";
             gameMsg.style.color = "#00ff00";
         }
     }
@@ -161,15 +153,16 @@
         
         const level = parseInt(levelSelector.value);
         
-        // --- NUEVA LÓGICA DE ESCALADO ---
-        totalToEliminate = level * 10; // Nivel 1 = 10, Nivel 2 = 20...
-        currentSpeed = 1 + (level * 0.7); // La velocidad aumenta con el nivel
+        // --- NUEVOS VALORES SUAVIZADOS ---
+        totalToEliminate = level * 10;
+        // La velocidad ahora empieza en 0.5 y sube muy poco por nivel
+        currentSpeed = 0.5 + (level * 0.4); 
         
         eliminatedInLevel = 0;
         isLevelActive = true;
         updateStats();
         
-        gameMsg.innerText = `Nivel ${level}: Elimina ${totalToEliminate} burbujas.`;
+        gameMsg.innerText = `Nivel ${level}: Objetivo ${totalToEliminate} burbujas.`;
         gameMsg.style.color = "rgba(255,255,255,0.6)";
 
         const parent = canvas.parentElement;
@@ -180,7 +173,6 @@
         
         circles = [];
         particles = [];
-        // Creamos la cantidad de círculos correspondiente al nivel
         for (let i = 0; i < totalToEliminate; i++) {
             circles.push(new Circle(i, currentSpeed));
         }
@@ -189,10 +181,7 @@
             animationId = requestAnimationFrame(animate);
             ctx.clearRect(0, 0, window_width, window_height);
             circles.forEach(c => c.update(ctx));
-            particles = particles.filter(p => {
-                p.update(ctx);
-                return p.alpha > 0;
-            });
+            particles = particles.filter(p => { p.update(ctx); return p.alpha > 0; });
         }
         animate();
     }
