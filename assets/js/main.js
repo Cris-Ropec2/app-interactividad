@@ -1,9 +1,3 @@
-/**
- * main.js - Juego de Burbujas: Curva de Velocidad Suavizada
- * Programador: Christopher Rodríguez Pérez
- * Instituto Tecnológico de Pachuca
- */
-
 (() => {
     const canvas = document.getElementById("canvas-rebote");
     const ctx = canvas.getContext("2d");
@@ -21,7 +15,7 @@
     let eliminatedInLevel = 0;
     let totalToEliminate = 10; 
     let isLevelActive = false;
-    let currentSpeed = 0.5; // Base mucho más baja
+    let currentSpeed = 0.5;
 
     const mouse = { x: null, y: null };
 
@@ -41,7 +35,7 @@
             const c = circles[i];
             if (!c.isExploding && !c.isDone) {
                 const dist = Math.sqrt(Math.pow(clickX - c.posX, 2) + Math.pow(clickY - c.posY, 2));
-                if (dist < c.radius + 8) { // Margen un poco más generoso
+                if (dist < c.radius + 8) {
                     c.explode();
                     break; 
                 }
@@ -78,17 +72,19 @@
             this.color = `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
             this.isDone = false;
             this.speed = speed;
-            this.resetPos(true);
+            this.resetPos(); // Siempre inicia desde abajo
         }
 
-        resetPos(isInitial = false) {
+        resetPos() {
             this.isExploding = false;
             this.alpha = 1;
             this.posX = Math.random() * (window_width - this.radius * 2) + this.radius;
-            // Mayor dispersión vertical para que no salgan todos juntos
-            this.posY = isInitial ? Math.random() * window_height : window_height + this.radius + (Math.random() * 400);
+            
+            // MODIFICACIÓN: Todos los círculos inician fuera de la pantalla (abajo)
+            // Se añade un margen aleatorio grande para que no salgan todos al mismo tiempo
+            this.posY = window_height + this.radius + (Math.random() * 600); 
+            
             this.dx = (Math.random() - 0.5) * 1.5;
-            // FORMULA DE VELOCIDAD: Se redujo la base y el multiplicador
             this.dy = -(Math.random() * this.speed + 0.4); 
         }
 
@@ -109,7 +105,9 @@
                 this.posX += this.dx;
                 this.posY += this.dy;
 
-                if (this.posY + this.radius < -50) this.resetPos(false);
+                // Si sale por arriba, se reinicia abajo para volver a intentarlo
+                if (this.posY + this.radius < -50) this.resetPos();
+                
                 if (this.posX + this.radius > window_width || this.posX - this.radius < 0) this.dx = -this.dx;
             } else {
                 this.alpha -= 0.15;
@@ -143,7 +141,7 @@
         
         if (eliminatedInLevel >= totalToEliminate) {
             isLevelActive = false;
-            gameMsg.innerText = "¡Nivel Superado! Elige el siguiente reto.";
+            gameMsg.innerText = "¡Nivel Superado! Selecciona el siguiente reto.";
             gameMsg.style.color = "#00ff00";
         }
     }
@@ -152,11 +150,8 @@
         if (animationId) cancelAnimationFrame(animationId);
         
         const level = parseInt(levelSelector.value);
-        
-        // --- NUEVOS VALORES SUAVIZADOS ---
         totalToEliminate = level * 10;
-        // La velocidad ahora empieza en 0.5 y sube muy poco por nivel
-        currentSpeed = 0.5 + (level * 0.4); 
+        currentSpeed = 0.5 + (level * 0.35); // Velocidad base corregida
         
         eliminatedInLevel = 0;
         isLevelActive = true;
