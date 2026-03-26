@@ -15,7 +15,7 @@
     let eliminatedInLevel = 0;
     let totalToEliminate = 10; 
     let isLevelActive = false;
-    let currentSpeed = 0.5;
+    let currentSpeed = 0.8; // Velocidad base aumentada ligeramente
 
     const mouse = { x: null, y: null };
 
@@ -35,7 +35,8 @@
             const c = circles[i];
             if (!c.isExploding && !c.isDone) {
                 const dist = Math.sqrt(Math.pow(clickX - c.posX, 2) + Math.pow(clickY - c.posY, 2));
-                if (dist < c.radius + 8) {
+                // Radio de colisión optimizado para respuesta rápida
+                if (dist < c.radius + 10) {
                     c.explode();
                     break; 
                 }
@@ -72,20 +73,19 @@
             this.color = `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
             this.isDone = false;
             this.speed = speed;
-            this.resetPos(); // Siempre inicia desde abajo
+            this.resetPos();
         }
 
         resetPos() {
             this.isExploding = false;
             this.alpha = 1;
             this.posX = Math.random() * (window_width - this.radius * 2) + this.radius;
+            // Salida escalonada desde el fondo
+            this.posY = window_height + this.radius + (Math.random() * 500); 
             
-            // MODIFICACIÓN: Todos los círculos inician fuera de la pantalla (abajo)
-            // Se añade un margen aleatorio grande para que no salgan todos al mismo tiempo
-            this.posY = window_height + this.radius + (Math.random() * 600); 
-            
-            this.dx = (Math.random() - 0.5) * 1.5;
-            this.dy = -(Math.random() * this.speed + 0.4); 
+            this.dx = (Math.random() - 0.5) * 2; // Un poco más de movimiento lateral
+            // Nueva fórmula de velocidad vertical (DY)
+            this.dy = -(Math.random() * this.speed + 0.8); 
         }
 
         explode() {
@@ -105,9 +105,7 @@
                 this.posX += this.dx;
                 this.posY += this.dy;
 
-                // Si sale por arriba, se reinicia abajo para volver a intentarlo
                 if (this.posY + this.radius < -50) this.resetPos();
-                
                 if (this.posX + this.radius > window_width || this.posX - this.radius < 0) this.dx = -this.dx;
             } else {
                 this.alpha -= 0.15;
@@ -141,7 +139,7 @@
         
         if (eliminatedInLevel >= totalToEliminate) {
             isLevelActive = false;
-            gameMsg.innerText = "¡Nivel Superado! Selecciona el siguiente reto.";
+            gameMsg.innerText = "¡Nivel Superado! Selecciona el siguiente.";
             gameMsg.style.color = "#00ff00";
         }
     }
@@ -151,7 +149,8 @@
         
         const level = parseInt(levelSelector.value);
         totalToEliminate = level * 10;
-        currentSpeed = 0.5 + (level * 0.35); // Velocidad base corregida
+        // Velocidad escalonada un poco más alta: 0.8 en Nivel 1, ~4.5 en Nivel 10
+        currentSpeed = 0.8 + (level * 0.4); 
         
         eliminatedInLevel = 0;
         isLevelActive = true;
